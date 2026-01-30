@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    .head{
+        display: flex;
+        margin: 0;
+        padding: 15px;
+        justify-content: center;
+        background-color: slategrey;
+        height: 4vh;
+        width: 100vw;
+        gap: 1em;
+    }
+    .ipt-box{
+        border: none;
+        border-radius: 8px;
+    }
+    .body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: darkslategrey;
+        height: 100vh;
+        width: 100vw;
+    }
+    .text{
+        display: flex;
+        justify-content: space-between;
+    }
+    .temp{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        width: 200px;
+        font-size: xx-large;
+    }
+    .location{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        height: 200px;
+        width: 200px;
+        font-size: xx-large;
+    }
+    .weather{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        width: 200px;
+    }
+    body{
+        background-color: darkslategrey;
+    }
+    .btn{
+        border: none;
+        border-radius: 20px;
+        width: 59px;
+        align-items: center;
+    }
+    </style>
+</head>
+<body>
+    <div class="head">
+        <input type="text" class="ipt-box" placeholder="type..">
+        <button class="btn">search</button>
+    </div>
+    <div class="body">
+        <div class="text">
+            <div class="temp" style="color: aliceblue;">12.5</div>
+            <div class="location" style="color: aliceblue;">
+                Pune
+                <span>9:15</span>
+                <span>Friday</span>
+                <span>30/01/2026</span>
+            </div>
+            <div class="weather">
+                <div class="icon">
+                    <img src="143.png" alt="cloud">
+                </div>
+                <div class="condition"></div>
+            </div>
+        </div>
+     
+    </div>
+    <script>
+    let button = document.getElementsByClassName("btn")[0];
+    let update = document.getElementsByClassName("location")[0];
+    let input = document.getElementsByClassName("ipt-box")[0];
+
+    button.addEventListener("click", () => {
+        if (input.value.trim() === "") {
+            alert("Input Please");
+        } else {
+            update.innerHTML = `
+                ${input.value}
+                <span>9:15</span>
+                <span>Friday</span>
+                <span>30/01/2026</span>
+            `;
+        }
+    });
+</script>
+
+</body>
+</html>
