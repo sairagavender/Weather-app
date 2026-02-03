@@ -3,114 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ATMOSPHERIC_DATA_01</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <style>
-    *{
-        margin: 0;
-        padding: 0;
-    }
-    .head{
-        display: flex;
-        margin: 0;
-        padding: 15px;
-        justify-content: center;
-        background-color: slategrey;
-        height: 4vh;
-        width: 100vw;
-        gap: 1em;
-    }
-    .ipt-box{
-        border: none;
-        border-radius: 8px;
-    }
-    .body{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: darkslategrey;
-        height: 100vh;
-        width: 100vw;
-    }
-    .text{
-        display: flex;
-        justify-content: space-between;
-    }
-    .temp{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-        width: 200px;
-        font-size: xx-large;
-    }
-    .location{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        height: 200px;
-        width: 200px;
-        font-size: xx-large;
-    }
-    .weather{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-        width: 200px;
-    }
-    body{
-        background-color: darkslategrey;
-    }
-    .btn{
-        border: none;
-        border-radius: 20px;
-        width: 59px;
-        align-items: center;
-    }
+        :root {
+            --bg: #e8e6e1;
+            --ink: #1a1a1a;
+            --accent: #ff3c00;
+            --grid-line: rgba(26, 26, 26, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor logic */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--ink);
+            font-family: 'Space Mono', monospace;
+            overflow: hidden; /* Prevent scroll, keeping it poster-like */
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 60px 1fr 100px;
+        }
+
+        /* --- VISUAL NOISE OVERLAY --- */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.08;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+        }
+        
+        body:hover .cursor {
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent);
+        }
+
+        /* --- HEADER AREA --- */
+        .top-bar {
+            border-bottom: 1px solid var(--ink);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+
+        .meta-data span {
+            margin-right: 2rem;
+            position: relative;
+        }
+
+        .meta-data span::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: blink 2s infinite;
+        }
+
+        /* --- MAIN GRID LAYOUT --- */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            height: 100%;
+            position: relative;
+        }
+
+        .grid-col {
+            border-right: 1px solid var(--ink);
+            position: relative;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.5s ease;
+        }
+
+        /* --- INPUT SECTION --- */
+        .input-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        .ipt-box {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--ink);
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 3rem;
+            color: var(--ink);
+            outline: none;
+            padding: 10px 0;
+            transition: border-color 0.3s;
+        }
+
+        .ipt-box:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        .ipt-box::placeholder {
+            color: rgba(26,26,26, 0.3);
+        }
+
+        .btn-search {
+            margin-top: 1rem;
+            background: var(--ink);
+            color: var(--bg);
+            border: none;
+            padding: 1rem 2rem;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: none; /* using custom cursor */
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-search:hover {
+            transform: skewX(-10deg);
+            background: var(--accent);
+            color: var(--ink);
+        }
+
+        /* --- TYPOGRAPHY EXPERIMENTS --- */
+        .big-temp {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18vw; /* Responsive huge size */
+            line-height: 0.8;
+            font-weight: 700;
+            position: absolute;
+            letter-spacing: -10px;
+            z-index: 1;
+            mix-blend-mode: exclusion; /* Cool overlap effect */
+            pointer-events: none;
+        }
+
+        .location-display {
+            position: absolute;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 4rem;
+            bottom: 3rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            height: 100%;
+            text-align: right;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .weather-icon-wrapper {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--ink);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .weather-icon-wrapper img {
+            width: 150px;
+            height: 150px;
+            filter: grayscale(100%) contrast(150%);
+            transition: transform 1s ease;
+        }
+        
+        .weather-icon-wrapper:hover img {
+            transform: scale(1.5) rotate(15deg);
+        }
+
+        /* --- DECORATIVE ELEMENTS --- */
+        .circle-decor {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            top: 20%;
+            left: -100px;
+            z-index: 0;
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.5;
+        }
+
+        .condition-text {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            border-top: 1px solid var(--ink);
+            padding-top: 1rem;
+        }
+
+        /* --- FOOTER MARQUEE --- */
+        .marquee-container {
+            border-top: 1px solid var(--ink);
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            background: var(--ink);
+            color: var(--bg);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+            font-size: 3rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            padding-left: 100%; /* Start off screen */
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            body { grid-template-rows: auto 1fr auto; height: auto; overflow-y: auto;}
+            .main-grid { grid-template-columns: 1fr; }
+            .grid-col { border-right: none; border-bottom: 1px solid var(--ink); min-height: 300px;}
+            .big-temp { font-size: 30vw; position: relative; bottom: 0; right: 0; }
+            .location-display { writing-mode: horizontal-tb; transform: none; font-size: 3rem; }
+        }
+        
+        /* Helper for JS updates */
+        .hidden { opacity: 0; }
+        .fade-in { animation: fadeIn 1s forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
-    <div class="head">
-        <input type="text" class="ipt-box" placeholder="type..">
-        <button class="btn">search</button>
+    
+    <div class="noise"></div>
+    <div class="cursor"></div>
+
+    <div class="top-bar">
+        <div class="brand">ATMOS_V.1.0 // EXPERIMENTAL_BUILD</div>
+        <div class="meta-data">
+            <span class="date">--/--/--</span>
+            <span class="time">--:--</span>
+        </div>
     </div>
-    <div class="body">
-        <div class="text">
-            <div class="temp" style="color: aliceblue;">12.5</div>
-            <div class="location" style="color: aliceblue;">
-                Pune
-                <span>9:15</span>
-                <span>Friday</span>
-                <span>30/01/2026</span>
+
+    <div class="main-grid">
+        
+        <div class="grid-col">
+            <div class="input-wrapper">
+                <label style="font-size: 0.7rem; display:block; margin-bottom: 5px;">INPUT COORDINATES / CITY NAME</label>
+                <input type="text" class="ipt-box" placeholder="Tokyo">
+                <button class="btn-search">INITIATE SEARCH</button>
             </div>
-            <div class="weather">
-                <div class="icon">
-                    <img src="143.png" alt="cloud">
-                </div>
-                <div class="condition"></div>
+            
+            <div class="weather-details" style="margin-top: auto;">
+                <div class="stamp" style="border: 1px solid var(--accent); color: var(--accent); display: inline-block; padding: 5px 10px; transform: rotate(-5deg); font-weight: bold;">LIVE FEED</div>
+                <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">
+                    Trigger waring<br>
+                    6 7<br>
+                    
+                </p>
             </div>
         </div>
-     
+
+        <div class="grid-col">
+            <div class="weather-icon-wrapper">
+                <div style="font-size: 5rem; color: var(--grid-line);">?</div>
+                <img src="" alt="" class="weather-icon" style="display: none;">
+            </div>
+            <div class="condition-text">WAITING FOR INPUT...</div>
+            <div class="circle-decor"></div>
+        </div>
+
+        <div class="grid-col" style="background: var(--ink); color: var(--bg); overflow: hidden;">
+            <div class="location-display">Earth</div>
+            <div class="big-temp">00°</div>
+        </div>
+
     </div>
-    <script>
-    let button = document.getElementsByClassName("btn")[0];
-    let update = document.getElementsByClassName("location")[0];
-    let input = document.getElementsByClassName("ipt-box")[0];
+
+    <div class="marquee-container">
+        <div class="marquee-content">jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew/jew
+        </div>
+    </div>
+
+<script>
+    // --- Cursor Logic ---
+    const cursor = document.querySelector('.cursor');
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    // --- Weather Logic ---
+    let button = document.querySelector(".btn-search");
+    let input = document.querySelector(".ipt-box");
+    let tempBox = document.querySelector(".big-temp");
+    let locationBox = document.querySelector(".location-display");
+    let conditionBox = document.querySelector(".condition-text");
+    let iconBox = document.querySelector(".weather-icon");
+    let dateBox = document.querySelector(".date");
+    let timeBox = document.querySelector(".time");
+    let marqueeText = document.querySelector(".marquee-content");
+
+    // Initialize Default
+    const updateTime = () => {
+        const now = new Date();
+        dateBox.innerText = now.toLocaleDateString();
+        timeBox.innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
 
     button.addEventListener("click", () => {
-        if (input.value.trim() === "") {
-            alert("Input Please");
+        const city = input.value.trim();
+        if (city === "") {
+            // Shake animation for error
+            input.style.transform = "translateX(10px)";
+            setTimeout(() => input.style.transform = "translateX(0)", 100);
         } else {
-            update.innerHTML = `
-                ${input.value}
-                <span>9:15</span>
-                <span>Friday</span>
-                <span>30/01/2026</span>
-            `;
+            getWeather(city).then(data => {
+                if(data) updateDOM(data);
+            });
         }
     });
-</script>
 
+    // Allow Enter key
+    input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            button.click();
+        }
+    });
+
+    async function getWeather(city){
+        const apiKey="34716fcc62e24682b4463203260302";
+        const url=`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                conditionBox.innerHTML = "ERR: 404 // CITY NOT FOUND";
+                return null;
+            }
+            const jsonData = await response.json();
+            return jsonData;
+        } catch (error) {
+            console.error(error);
+            conditionBox.innerHTML = "ERR: NETWORK FAILURE";
+            return null;
+        }
+    }
+
+    function updateDOM(data){
+        // Add fade animation class
+        const elements = [tempBox, locationBox, conditionBox];
+        
+
+        // Update Text
+        tempBox.innerHTML = (data.current.temp_c) + "°";
+        conditionBox.innerHTML = data.current.condition.text;
+        
+        // Image Logic
+        iconBox.src = "https:" + data.current.condition.icon;
+        iconBox.style.display = "block";
+        document.querySelector('.weather-icon-wrapper div').style.display = 'none';
+
+        // Location Logic
+        locationBox.innerHTML = data.location.name;
+
+        // Update Marquee with live data
+        const scrollText = `CURRENT CONDITION: ${data.current.condition.text.toUpperCase()} // HUMIDITY: ${data.current.humidity}% // WIND: ${data.current.wind_kph} KPH // LOCAL TIME: ${data.location.localtime} // `;
+        marqueeText.innerHTML = scrollText + scrollText + scrollText;
+    }
+</script>
 </body>
 </html>

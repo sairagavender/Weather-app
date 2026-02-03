@@ -1,0 +1,171 @@
+/* IMPORT ARTSY FONTS */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=Special+Elite&display=swap');
+
+/* RESET */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #f4f1ec;
+    font-family: 'EB Garamond', serif;
+    overflow-x: hidden;
+    color: #2b2b2b;
+}
+
+/* PAPER TEXTURE OVERLAY */
+.paper-grain {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(0,0,0,0.02),
+            rgba(0,0,0,0.02) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* INK BLOBS */
+.ink-blot {
+    position: absolute;
+    background: rgba(0,0,0,0.07);
+    filter: blur(25px);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.blot-1 {
+    width: 300px;
+    height: 300px;
+    top: 10%;
+    left: -100px;
+}
+
+.blot-2 {
+    width: 220px;
+    height: 220px;
+    bottom: 5%;
+    right: -80px;
+}
+
+/* HEADER */
+.head {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 15px;
+    padding: 40px;
+    transform: rotate(-1deg);
+}
+
+/* INPUT */
+.ipt-box {
+    background: none;
+    border: none;
+    border-bottom: 2px dashed #333;
+    font-size: 22px;
+    padding: 8px 5px;
+    width: 260px;
+    font-family: 'Special Elite', cursive;
+}
+
+.ipt-box::placeholder {
+    opacity: 0.4;
+}
+
+.ipt-box:focus {
+    outline: none;
+    border-bottom-style: solid;
+}
+
+/* BUTTON */
+.btn {
+    background: #2b2b2b;
+    color: #f4f1ec;
+    border: none;
+    padding: 10px 22px;
+    font-family: 'Special Elite', cursive;
+    font-size: 16px;
+    cursor: pointer;
+    transform: rotate(2deg);
+}
+
+.btn:hover {
+    transform: rotate(-2deg) scale(1.05);
+}
+
+/* BODY CARD */
+.body {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+/* WEATHER NOTE */
+.text {
+    background: #fffaf3;
+    padding: 50px;
+    width: 360px;
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,0.1),
+        6px 6px 0 rgba(0,0,0,0.15);
+    transform: rotate(1.5deg);
+    position: relative;
+}
+
+/* TEMP */
+.temp {
+    font-size: 64px;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+/* LOCATION */
+.location {
+    font-family: 'Special Elite', cursive;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+    opacity: 0.8;
+}
+
+/* WEATHER ROW */
+.weather {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.weather img {
+    width: 50px;
+    filter: grayscale(100%) contrast(120%);
+}
+
+.condition {
+    font-style: italic;
+    font-size: 18px;
+}
+
+/* DATE & TIME */
+.date, .time {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* HAND-DRAWN BORDER EFFECT */
+.text::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border: 2px dashed rgba(0,0,0,0.15);
+    transform: rotate(-1deg);
+    pointer-events: none;
+}

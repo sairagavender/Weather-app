@@ -1,0 +1,149 @@
+/* Color Palette: "Sunday Morning Coffee" */
+:root {
+    --bg-color: #f2f0e9;        /* Warm oatmeal/cream */
+    --card-bg: #fdfbf7;         /* Off-white paper */
+    --border-color: #d1d1cd;    /* Soft grey for definition */
+    --text-primary: #3a3a3a;    /* Soft Charcoal (never pure black) */
+    --text-secondary: #7e7e78;  /* Muted Taupe */
+    --accent: #8da399;          /* Sage Green */
+    --accent-warm: #d6bfa9;     /* Dusty Sand */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    /* Using a Serif for 'artsy' headers, Sans-serif for readability */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* Header & Search Area */
+.head {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 0; /* More breathing room */
+    gap: 15px;
+    background-color: transparent; /* No bar background */
+}
+
+.ipt-box {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--text-secondary); /* Minimal underline style */
+    border-radius: 0;
+    padding: 10px 5px;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 200px;
+    font-family: 'Georgia', serif; /* Classy input font */
+    transition: border-color 0.3s ease;
+}
+
+.ipt-box::placeholder {
+    color: #b0b0aa;
+    font-style: italic;
+}
+
+.ipt-box:focus {
+    border-color: var(--accent);
+}
+
+.btn {
+    background: var(--text-primary);
+    color: var(--bg-color);
+    border: none;
+    border-radius: 50px; /* Pill shape */
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: var(--accent);
+}
+
+/* Main Content Area */
+.body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Aligns to top third for better visual balance */
+    height: auto;
+    padding-top: 2rem;
+}
+
+.text {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color); /* Subtle stroke instead of shadow */
+    padding: 4rem 3rem;
+    border-radius: 8px; /* Slight rounding, not bubbly */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    min-width: 340px;
+    position: relative;
+    
+    /* A flat, hard shadow gives it a 'printed card' feel */
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.03); 
+}
+
+/* The visual centerpiece */
+.temp {
+    font-family: 'Georgia', serif; /* Serif font for the big number */
+    font-size: 6rem;
+    font-weight: normal;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.location {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.weather {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+/* Desaturating the icons to match the pale theme */
+.weather img {
+    width: 80px;
+    opacity: 0.8; 
+    filter: sepia(0.2) grayscale(0.2); /* Makes icons look a bit vintage */
+}
+
+.condition {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--accent);
+    margin-top: 5px;
+}
+
+/* Date/Time Styling */
+.date, .time {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+}

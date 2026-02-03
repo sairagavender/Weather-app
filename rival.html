@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | Elemental Interface</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --accent: #38bdf8;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --tilt-x: 0deg;
+            --tilt-y: 0deg;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* Essential for 3D tilt */
+            transition: background-color 1s ease;
+        }
+
+        /* --- THE ATMOSPHERE (CANVAS) --- */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- THE INTERFACE --- */
+        .interface-wrapper {
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+            transition: transform 0.1s ease-out; /* Smooth follow */
+        }
+
+        .main-card {
+            width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shine Effect on Hover */
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-20deg);
+            pointer-events: none;
+        }
+
+        /* --- SEARCH --- */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50px;
+            padding: 5px 5px 5px 20px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--accent);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover { transform: scale(1.1); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .temp-huge {
+            font-size: 6rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.5));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .weather-status {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .weather-icon-img {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+        }
+
+        /* --- GRID STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .stat-box:hover { background: rgba(255,255,255,0.08); }
+
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px; }
+        .stat-val { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+
+        /* --- FORECAST --- */
+        .forecast-strip {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .day-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* --- LOADING & UTILS --- */
+        .loader {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* Dynamic Color Classes */
+        .theme-hot { --accent: #ff8c42; --bg-color: #2b1408; }
+        .theme-cold { --accent: #00f2ff; --bg-color: #081b2b; }
+        .theme-night { --accent: #a78bfa; --bg-color: #0f0a1e; }
+        .theme-neutral { --accent: #38bdf8; --bg-color: #0f172a; }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="interface-wrapper" id="tilt-wrapper">
+        <div class="main-card">
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="cityInput" placeholder="Locate sector...">
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="loader" id="loader"></div>
+
+            <div id="weatherContent" style="display: none;">
+                <div class="hero">
+                    <div class="location-badge" id="locationTag">--</div>
+                    <div class="temp-huge" id="mainTemp">--°</div>
+                    <div class="weather-status">
+                        <img id="weatherIcon" class="weather-icon-img" src="" alt="">
+                        <span id="conditionText">--</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label"><i class="fas fa-wind"></i> Wind</div>
+                        <div class="stat-val" id="windSpeed">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label"><i class="fas fa-water"></i> Humidity</div>
+                        <div class="stat-val" id="humidity">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label"><i class="fas fa-eye"></i> Vis</div>
+                        <div class="stat-val" id="visibility">--</div>
+                    </div>
+                </div>
+
+                <div class="forecast-strip" id="forecastContainer">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /** --- 1. CONFIGURATION --- **/
+    const API_KEY = "34716fcc62e24682b4463203260302"; // Using your key
+    const BASE_URL = "https://api.weatherapi.com/v1/forecast.json";
+    
+    // DOM Elements
+    const els = {
+        input: document.getElementById('cityInput'),
+        btn: document.getElementById('searchBtn'),
+        wrapper: document.getElementById('tilt-wrapper'),
+        content: document.getElementById('weatherContent'),
+        loader: document.getElementById('loader'),
+        locTag: document.getElementById('locationTag'),
+        temp: document.getElementById('mainTemp'),
+        icon: document.getElementById('weatherIcon'),
+        cond: document.getElementById('conditionText'),
+        wind: document.getElementById('windSpeed'),
+        hum: document.getElementById('humidity'),
+        vis: document.getElementById('visibility'),
+        forecast: document.getElementById('forecastContainer')
+    };
+
+    /** --- 2. 3D TILT ENGINE --- **/
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        // Calculate tilt angles (max 15 degrees)
+        const tiltX = (0.5 - x) * 15; 
+        const tiltY = (y - 0.5) * 15;
+
+        // Apply to CSS variable for smooth transition
+        document.documentElement.style.setProperty('--tilt-x', `${tiltX}deg`);
+        document.documentElement.style.setProperty('--tilt-y', `${tiltY}deg`);
+    });
+
+    /** --- 3. PARTICLE PHYSICS ENGINE (Rain/Snow/Dust) --- **/
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId;
+    let weatherState = 'clear'; // 'rain', 'snow', 'clear', 'clouds'
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor(type) {
+            this.type = type;
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            
+            if(this.type === 'rain') {
+                this.vy = Math.random() * 15 + 10; // Fast vertical speed
+                this.vx = Math.random() * 2 - 1; // Slight wind
+                this.len = Math.random() * 20 + 10;
+                this.color = 'rgba(174, 194, 224, 0.6)';
+            } else if (this.type === 'snow') {
+                this.vy = Math.random() * 2 + 1; // Slow falling
+                this.vx = Math.random() * 2 - 1; // Drifting
+                this.radius = Math.random() * 3 + 1;
+                this.color = 'rgba(255, 255, 255, 0.8)';
+            } else { // Clear/Cloudy (Ambient dust)
+                this.vy = Math.random() * 0.5 - 0.25; // Float
+                this.vx = Math.random() * 0.5 - 0.25;
+                this.radius = Math.random() * 2;
+                this.color = 'rgba(255, 255, 255, 0.3)';
+            }
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Screen wrapping
+            if (this.y > canvas.height) this.y = -10;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.x < 0) this.x = canvas.width;
+        }
+
+        draw() {
+            ctx.beginPath();
+            if(this.type === 'rain') {
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.vx, this.y + this.len);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = this.color;
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    function initParticles(type) {
+        particles = [];
+        weatherState = type;
+        const count = type === 'rain' ? 300 : type === 'snow' ? 150 : 80;
+        for(let i=0; i<count; i++) {
+            particles.push(new Particle(type));
+        }
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        animationId = requestAnimationFrame(animateParticles);
+    }
+    
+    // Start with ambient
+    initParticles('clear');
+    animateParticles();
+
+
+    /** --- 4. DATA HANDLING --- **/
+    els.btn.addEventListener('click', searchWeather);
+    els.input.addEventListener('keypress', (e) => e.key === 'Enter' && searchWeather());
+
+    async function searchWeather() {
+        const city = els.input.value.trim();
+        if(!city) return;
+
+        els.content.style.display = 'none';
+        els.loader.style.display = 'block';
+
+        try {
+            const url = `${BASE_URL}?key=${API_KEY}&q=${city}&days=3&aqi=no&alerts=no`;
+            const res = await fetch(url);
+            if(!res.ok) throw new Error('City not found');
+            const data = await res.json();
+            
+            updateInterface(data);
+        } catch(err) {
+            alert(err.message);
+        } finally {
+            els.loader.style.display = 'none';
+        }
+    }
+
+    function updateInterface(data) {
+        const cur = data.current;
+        const loc = data.location;
+        const fore = data.forecast.forecastday;
+
+        // 1. Text Data
+        els.locTag.innerHTML = `${loc.name}, ${loc.country} <span style="opacity:0.6">| ${loc.localtime.split(' ')[1]}</span>`;
+        els.temp.innerHTML = `${Math.round(cur.temp_c)}°`;
+        els.cond.innerHTML = cur.condition.text;
+        els.icon.src = "https:" + cur.condition.icon;
+
+        els.wind.innerHTML = `${cur.wind_kph} <span style="font-size:0.7em">km/h</span>`;
+        els.hum.innerHTML = `${cur.humidity}%`;
+        els.vis.innerHTML = `${cur.vis_km} <span style="font-size:0.7em">km</span>`;
+
+        // 2. Forecast Loop
+        els.forecast.innerHTML = fore.map(day => {
+            const d = new Date(day.date);
+            const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+            return `
+                <div class="day-item">
+                    <span style="color:var(--text-secondary)">${dayName}</span>
+                    <img src="https:${day.day.condition.icon}" width="35">
+                    <strong>${Math.round(day.day.avgtemp_c)}°</strong>
+                </div>
+            `;
+        }).join('');
+
+        // 3. Dynamic Atmosphere (Theme & Particles)
+        setAtmosphere(cur);
+        
+        // Show Content
+        els.content.style.display = 'block';
+    }
+
+    function setAtmosphere(current) {
+        const code = current.condition.code;
+        const isDay = current.is_day;
+        const temp = current.temp_c;
+        const desc = current.condition.text.toLowerCase();
+        
+        // Reset Classes
+        document.body.className = '';
+
+        // A. Determine Color Theme
+        if (isDay === 0) {
+            document.body.classList.add('theme-night');
+        } else if (temp > 25) {
+            document.body.classList.add('theme-hot');
+        } else if (temp < 5) {
+            document.body.classList.add('theme-cold');
+        } else {
+            document.body.classList.add('theme-neutral');
+        }
+
+        // B. Determine Particle System
+        if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) {
+            initParticles('rain');
+        } else if (desc.includes('snow') || desc.includes('blizzard') || desc.includes('ice')) {
+            initParticles('snow');
+        } else {
+            initParticles('clear');
+        }
+    }
+
+</script>
+</body>
+</html>

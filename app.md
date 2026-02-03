@@ -1,0 +1,51 @@
+{
+    "location": {
+        "name": "London",
+        "region": "City of London, Greater London",
+        "country": "United Kingdom",
+        "lat": 51.5171,
+        "lon": -0.1062,
+        "tz_id": "Europe/London",
+        "localtime_epoch": 1770100405,
+        "localtime": "2026-02-03 06:33"
+    },
+    "current": {
+        "last_updated_epoch": 1770100200,
+        "last_updated": "2026-02-03 06:30",
+        "temp_c": 6.0,
+        "temp_f": 42.8,
+        "is_day": 0,
+        "condition": {
+            "text": "Overcast",
+            "icon": "//cdn.weatherapi.com/weather/64x64/night/122.png",
+            "code": 1009
+        },
+        "wind_mph": 14.3,
+        "wind_kph": 23.0,
+        "wind_degree": 77,
+        "wind_dir": "ENE",
+        "pressure_mb": 992.0,
+        "pressure_in": 29.29,
+        "precip_mm": 0.0,
+        "precip_in": 0.0,
+        "humidity": 81,
+        "cloud": 100,
+        "feelslike_c": 2.0,
+        "feelslike_f": 35.6,
+        "windchill_c": 1.4,
+        "windchill_f": 34.4,
+        "heatindex_c": 5.5,
+        "heatindex_f": 41.9,
+        "dewpoint_c": 3.1,
+        "dewpoint_f": 37.7,
+        "vis_km": 10.0,
+        "vis_miles": 6.0,
+        "uv": 0.0,
+        "gust_mph": 19.6,
+        "gust_kph": 31.5,
+        "short_rad": 0,
+        "diff_rad": 0,
+        "dni": 0,
+        "gti": 0
+    }
+}
